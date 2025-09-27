@@ -1,6 +1,9 @@
-=====1.Залы======
+ДЕЛАЛ В ПОСГРЕСЕ!!!!
+Поэтому тут SERIAL, а не AUTO_INCREMENT
+
+
 CREATE TABLE gyms (
-    gym_id INT PRIMARY KEY AUTO_INCREMENT,
+    gym_id SERIAL PRIMARY KEY,
     gym_name VARCHAR(100) NOT NULL,
     address VARCHAR(200) NOT NULL,
     gym_phone VARCHAR(20),
@@ -8,31 +11,29 @@ CREATE TABLE gyms (
     close_time TIME NOT NULL
 );
 
-====2. Клиенты======
+
 CREATE TABLE clients (
-    client_id INT PRIMARY KEY AUTO_INCREMENT,
+    client_id SERIAL PRIMARY KEY,
     first_name VARCHAR(50) NOT NULL,
     last_name VARCHAR(50) NOT NULL,
     phone VARCHAR(20) UNIQUE,
     email VARCHAR(100),
     date_of_birth DATE,
-    registration_date DATETIME DEFAULT CURRENT_TIMESTAMP
+    registration_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-=====3. Посещения======
 CREATE TABLE visits (
-    visit_id INT PRIMARY KEY AUTO_INCREMENT,
+    visit_id SERIAL PRIMARY KEY,
     client_id INT NOT NULL,
     gym_id INT NOT NULL,
-    check_in_time DATETIME NOT NULL,
-    check_out_time DATETIME,
+    check_in_time TIMESTAMP NOT NULL,
+    check_out_time TIMESTAMP,
     FOREIGN KEY (client_id) REFERENCES clients(client_id),
     FOREIGN KEY (gym_id) REFERENCES gyms(gym_id)
 );
 
-=====4. Сотрудники======
 CREATE TABLE employees (
-    employee_id INT PRIMARY KEY AUTO_INCREMENT,
+    employee_id SERIAL PRIMARY KEY,
     first_name VARCHAR(50) NOT NULL,
     last_name VARCHAR(50) NOT NULL,
     emp_phone VARCHAR(20),
@@ -44,9 +45,9 @@ CREATE TABLE employees (
     FOREIGN KEY (gym_id) REFERENCES gyms(gym_id)
 );
 
-=====5. Оборудование =====
+
 CREATE TABLE equipment (
-    equipment_id INT PRIMARY KEY AUTO_INCREMENT,
+    equipment_id SERIAL PRIMARY KEY,
     equipment_name VARCHAR(100) NOT NULL,
     buy_date DATE,
     equipment_status VARCHAR(20) DEFAULT 'active',
@@ -54,18 +55,18 @@ CREATE TABLE equipment (
     FOREIGN KEY (gym_id) REFERENCES gyms(gym_id)
 );
 
-==========6. Тарифы ======
+
 CREATE TABLE rates (
-    rate_id INT PRIMARY KEY AUTO_INCREMENT,
+    rate_id SERIAL PRIMARY KEY,
     rate_name VARCHAR(100) NOT NULL,
     price DECIMAL(10,2) NOT NULL,
     duration_days INT NOT NULL,
     description TEXT
 );
 
-====== 7. Абонементы =========
+
 CREATE TABLE subscriptions (
-    subscription_id INT PRIMARY KEY AUTO_INCREMENT,  
+    subscription_id SERIAL PRIMARY KEY,  
     client_id INT NOT NULL,                          
     rate_id INT NOT NULL,                            
     start_date DATE NOT NULL,                        
@@ -74,3 +75,62 @@ CREATE TABLE subscriptions (
     FOREIGN KEY (client_id) REFERENCES clients(client_id),
     FOREIGN KEY (rate_id) REFERENCES rates(rate_id)
 );
+
+
+Для заполнения данными 
+
+-- Вставляем данные в таблицу залов
+INSERT INTO gyms (gym_name, address, gym_phone, open_time, close_time) VALUES
+('Скала', 'ул. Пушкина, 10', '+7-495-123-45-67', '07:00:00', '23:00:00'),
+('Скала', 'ул. Стахановская, 25', '+7-495-123-45-68', '06:00:00', '22:00:00'),
+('Скала', 'ул. Мира, 15', '+7-495-123-45-69', '08:00:00', '24:00:00');
+
+-- Вставляем данные в таблицу клиентов
+INSERT INTO clients (first_name, last_name, phone, email, date_of_birth) VALUES
+('Иван', 'Петров', '+7-900-111-22-33', 'ivan.petrov@mail.ru', '1990-05-15'),
+('Мария', 'Сидорова', '+7-900-111-22-34', 'maria.sidorova@gmail.com', '1985-12-20'),
+('Алексей', 'Козлов', '+7-900-111-22-35', 'alex.kozlov@yandex.ru', '1992-08-10'),
+('Екатерина', 'Николаева', '+7-900-111-22-36', 'katya.nikolaeva@mail.ru', '1988-03-25'),
+('Дмитрий', 'Васильев', '+7-900-111-22-37', 'dima.vasilev@gmail.com', '1995-11-08');
+
+-- Вставляем данные в таблицу тарифов
+INSERT INTO rates (rate_name, price, duration_days, description) VALUES
+('Разовый', 500.00, 1, 'Разовое посещение зала'),
+('Месячный', 3000.00, 30, 'Абонемент на 1 месяц'),
+('Трехмесячный', 8000.00, 90, 'Абонемент на 3 месяца со скидкой'),
+('Годовой', 25000.00, 365, 'Абонемент на 1 год');
+
+-- Вставляем данные в таблицу сотрудников
+INSERT INTO employees (first_name, last_name, emp_phone, emp_email, gym_id, hire_date, post, salary) VALUES
+('Анна', 'Иванова', '+7-900-222-33-44', 'anna.ivanova@skala.ru', 1, '2023-01-15', 'Администратор', 45000.00),
+('Сергей', 'Федоров', '+7-900-222-33-45', 'sergey.fedorov@skala.ru', 1, '2023-02-20', 'Тренер', 60000.00),
+('Ольга', 'Смирнова', '+7-900-222-33-46', 'olga.smirnova@skala.ru', 2, '2023-03-10', 'Администратор', 45000.00),
+('Павел', 'Дмитриев', '+7-900-222-33-47', 'pavel.dmitriev@skala.ru', 2, '2023-01-25', 'Тренер', 55000.00),
+('Наталья', 'Романова', '+7-900-222-33-48', 'natalia.romanova@skala.ru', 3, '2023-04-05', 'Администратор', 47000.00);
+
+-- Вставляем данные в таблицу оборудования
+INSERT INTO equipment (equipment_name, buy_date, equipment_status, gym_id) VALUES
+('Беговая дорожка Pro', '2024-01-10', 'active', 1),
+('Силовая рама', '2023-11-15', 'active', 1),
+('Гантельный набор', '2024-02-20', 'active', 1),
+('Велотренажер', '2023-12-05', 'active', 2),
+('Тренажер для жима ногами', '2024-01-30', 'active', 2),
+('Турник брусья', '2023-10-12', 'active', 3),
+('Штанга олимпийская', '2024-03-01', 'active', 3);
+
+-- Вставляем данные в таблицу абонементов
+INSERT INTO subscriptions (client_id, rate_id, start_date, end_date, subscription_status) VALUES
+(1, 2, '2024-05-01', '2024-05-31', 'active'),
+(2, 3, '2024-04-15', '2024-07-14', 'active'),
+(3, 4, '2024-03-01', '2025-03-01', 'active'),
+(4, 2, '2024-05-10', '2024-06-09', 'active'),
+(5, 1, '2024-05-20', '2024-05-20', 'used');
+
+-- Вставляем данные в таблицу посещений
+INSERT INTO visits (client_id, gym_id, check_in_time, check_out_time) VALUES
+(1, 1, '2024-05-15 10:30:00', '2024-05-15 12:00:00'),
+(2, 2, '2024-05-15 18:00:00', '2024-05-15 19:30:00'),
+(3, 3, '2024-05-14 09:00:00', '2024-05-14 10:45:00'),
+(4, 1, '2024-05-16 16:20:00', '2024-05-16 17:50:00'),
+(1, 1, '2024-05-17 11:00:00', '2024-05-17 12:30:00'),
+(5, 2, '2024-05-18 20:00:00', '2024-05-18 21:15:00');
