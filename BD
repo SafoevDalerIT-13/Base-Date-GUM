@@ -1,7 +1,6 @@
 ДЕЛАЛ В ПОСГРЕСЕ!!!!
 Поэтому тут SERIAL, а не AUTO_INCREMENT
 
-
 CREATE TABLE gyms (
     gym_id SERIAL PRIMARY KEY,
     gym_name VARCHAR(100) NOT NULL,
@@ -10,7 +9,6 @@ CREATE TABLE gyms (
     open_time TIME NOT NULL,
     close_time TIME NOT NULL
 );
-
 
 CREATE TABLE clients (
     client_id SERIAL PRIMARY KEY,
@@ -40,11 +38,11 @@ CREATE TABLE employees (
     emp_email VARCHAR(100),
     gym_id INT,
     hire_date DATE NOT NULL,
+    dismissal_date DATE, 
     post VARCHAR(50) NOT NULL,
     salary DECIMAL(10,2) NOT NULL,
     FOREIGN KEY (gym_id) REFERENCES gyms(gym_id)
 );
-
 
 CREATE TABLE equipment (
     equipment_id SERIAL PRIMARY KEY,
@@ -55,15 +53,14 @@ CREATE TABLE equipment (
     FOREIGN KEY (gym_id) REFERENCES gyms(gym_id)
 );
 
-
 CREATE TABLE rates (
     rate_id SERIAL PRIMARY KEY,
     rate_name VARCHAR(100) NOT NULL,
     price DECIMAL(10,2) NOT NULL,
+    price_period VARCHAR(50), 
     duration_days INT NOT NULL,
     description TEXT
 );
-
 
 CREATE TABLE subscriptions (
     subscription_id SERIAL PRIMARY KEY,  
@@ -71,11 +68,11 @@ CREATE TABLE subscriptions (
     rate_id INT NOT NULL,                            
     start_date DATE NOT NULL,                        
     end_date DATE NOT NULL,                          
+    freeze_period VARCHAR(50), 
     subscription_status VARCHAR(20) DEFAULT 'active', 
     FOREIGN KEY (client_id) REFERENCES clients(client_id),
     FOREIGN KEY (rate_id) REFERENCES rates(rate_id)
 );
-
 
 Для заполнения данными 
 
@@ -93,20 +90,25 @@ INSERT INTO clients (first_name, last_name, phone, email, date_of_birth) VALUES
 ('Екатерина', 'Николаева', '+7-900-111-22-36', 'katya.nikolaeva@mail.ru', '1988-03-25'),
 ('Дмитрий', 'Васильев', '+7-900-111-22-37', 'dima.vasilev@gmail.com', '1995-11-08');
 
--- Вставляем данные в таблицу тарифов
-INSERT INTO rates (rate_name, price, duration_days, description) VALUES
-('Разовый', 500.00, 1, 'Разовое посещение зала'),
-('Месячный', 3000.00, 30, 'Абонемент на 1 месяц'),
-('Трехмесячный', 8000.00, 90, 'Абонемент на 3 месяца со скидкой'),
-('Годовой', 25000.00, 365, 'Абонемент на 1 год');
+-- Вставляем данные в таблицу тарифов (с добавлением периода действия цены)
+INSERT INTO rates (rate_name, price, price_period, duration_days, description) VALUES
+('Разовый', 500.00, '01.01.2024 - 31.12.2024', 1, 'Разовое посещение зала'),
+('Месячный', 3000.00, '01.01.2024 - 31.12.2024', 30, 'Абонемент на 1 месяц'),
+('Трехмесячный', 8000.00, '01.01.2024 - 31.12.2024', 90, 'Абонемент на 3 месяца со скидкой'),
+('Годовой', 25000.00, '01.01.2024 - 31.12.2024', 365, 'Абонемент на 1 год'),
+('Месячный утренний', 2500.00, '01.01.2024 - 31.12.2024', 30, 'Посещения с 07:00 до 17:00'),
+('Безлимит на месяц', 3500.00, '01.01.2024 - 31.12.2024', 30, 'Посещения в любое время'),
+('Полгода (вечерний)', 15000.00, '01.01.2024 - 31.12.2024', 180, 'Посещения с 17:00 до 23:00');
 
--- Вставляем данные в таблицу сотрудников
-INSERT INTO employees (first_name, last_name, emp_phone, emp_email, gym_id, hire_date, post, salary) VALUES
-('Анна', 'Иванова', '+7-900-222-33-44', 'anna.ivanova@skala.ru', 1, '2023-01-15', 'Администратор', 45000.00),
-('Сергей', 'Федоров', '+7-900-222-33-45', 'sergey.fedorov@skala.ru', 1, '2023-02-20', 'Тренер', 60000.00),
-('Ольга', 'Смирнова', '+7-900-222-33-46', 'olga.smirnova@skala.ru', 2, '2023-03-10', 'Администратор', 45000.00),
-('Павел', 'Дмитриев', '+7-900-222-33-47', 'pavel.dmitriev@skala.ru', 2, '2023-01-25', 'Тренер', 55000.00),
-('Наталья', 'Романова', '+7-900-222-33-48', 'natalia.romanova@skala.ru', 3, '2023-04-05', 'Администратор', 47000.00);
+-- Вставляем данные в таблицу сотрудников (с добавлением даты увольнения 0.0.0)
+INSERT INTO employees (first_name, last_name, emp_phone, emp_email, gym_id, hire_date, dismissal_date, post, salary) VALUES
+('Анна', 'Иванова', '+7-900-222-33-44', 'anna.ivanova@skala.ru', 1, '2023-01-15', '0001-01-01', 'Администратор', 45000.00),
+('Сергей', 'Федоров', '+7-900-222-33-45', 'sergey.fedorov@skala.ru', 1, '2023-02-20', '0001-01-01', 'Тренер', 60000.00),
+('Ольга', 'Смирнова', '+7-900-222-33-46', 'olga.smirnova@skala.ru', 2, '2023-03-10', '0001-01-01', 'Администратор', 45000.00),
+('Павел', 'Дмитриев', '+7-900-222-33-47', 'pavel.dmitriev@skala.ru', 2, '2023-01-25', '0001-01-01', 'Тренер', 55000.00),
+('Наталья', 'Романова', '+7-900-222-33-48', 'natalia.romanova@skala.ru', 3, '2023-04-05', '0001-01-01', 'Администратор', 47000.00),
+('Игорь', 'Петров', '+7-900-222-33-49', 'igor.petrov@skala.ru', 1, '2022-06-10', '0001-01-01', 'Тренер', 52000.00),
+('Елена', 'Кузнецова', '+7-900-222-33-50', 'elena.kuznetsova@skala.ru', 2, '2022-09-20', '0001-01-01', 'Администратор', 43000.00);
 
 -- Вставляем данные в таблицу оборудования
 INSERT INTO equipment (equipment_name, buy_date, equipment_status, gym_id) VALUES
@@ -116,15 +118,20 @@ INSERT INTO equipment (equipment_name, buy_date, equipment_status, gym_id) VALUE
 ('Велотренажер', '2023-12-05', 'active', 2),
 ('Тренажер для жима ногами', '2024-01-30', 'active', 2),
 ('Турник брусья', '2023-10-12', 'active', 3),
-('Штанга олимпийская', '2024-03-01', 'active', 3);
+('Штанга олимпийская', '2024-03-01', 'active', 3),
+('Эллиптический тренажер', '2024-02-15', 'active', 1),
+('Скамья для пресса', '2023-12-20', 'active', 2),
+('Тренажер для спины', '2024-01-05', 'active', 3);
 
--- Вставляем данные в таблицу абонементов
-INSERT INTO subscriptions (client_id, rate_id, start_date, end_date, subscription_status) VALUES
-(1, 2, '2024-05-01', '2024-05-31', 'active'),
-(2, 3, '2024-04-15', '2024-07-14', 'active'),
-(3, 4, '2024-03-01', '2025-03-01', 'active'),
-(4, 2, '2024-05-10', '2024-06-09', 'active'),
-(5, 1, '2024-05-20', '2024-05-20', 'used');
+-- Вставляем данные в таблицу абонементов (с добавлением периода заморозки)
+INSERT INTO subscriptions (client_id, rate_id, start_date, end_date, freeze_period, subscription_status) VALUES
+(1, 2, '2024-05-01', '2024-05-31', NULL, 'active'),
+(2, 3, '2024-04-15', '2024-07-14', NULL, 'active'),
+(3, 4, '2024-03-01', '2025-03-01', NULL, 'active'),
+(4, 2, '2024-05-10', '2024-06-09', '15.05.2024 - 25.05.2024', 'frozen'),
+(5, 1, '2024-05-20', '2024-05-20', NULL, 'used'),
+(1, 5, '2024-06-01', '2024-07-01', NULL, 'active'),
+(2, 6, '2024-05-01', '2024-05-31', '10.05.2024 - 20.05.2024', 'active');
 
 -- Вставляем данные в таблицу посещений
 INSERT INTO visits (client_id, gym_id, check_in_time, check_out_time) VALUES
@@ -133,4 +140,6 @@ INSERT INTO visits (client_id, gym_id, check_in_time, check_out_time) VALUES
 (3, 3, '2024-05-14 09:00:00', '2024-05-14 10:45:00'),
 (4, 1, '2024-05-16 16:20:00', '2024-05-16 17:50:00'),
 (1, 1, '2024-05-17 11:00:00', '2024-05-17 12:30:00'),
-(5, 2, '2024-05-18 20:00:00', '2024-05-18 21:15:00');
+(5, 2, '2024-05-18 20:00:00', '2024-05-18 21:15:00'),
+(2, 2, '2024-05-19 17:30:00', '2024-05-19 19:00:00'),
+(3, 3, '2024-05-20 08:45:00', '2024-05-20 10:15:00');
